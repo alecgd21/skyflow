@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tablero Aéreo Minimalista</title>
+<style>
+  body { font-family:'Segoe UI'; background:#f5f7fa; color:#333; display:flex; flex-direction:column; align-items:center; padding:20px; }
+  h1 { margin-bottom:20px; color:#2c3e50; text-align:center; }
+  .menu { display:flex; gap:15px; margin-bottom:20px; justify-content:center; }
+  .menu input[type="text"] { padding:10px; border-radius:8px; border:1px solid #ccc; width:200px; }
+  .menu button { background:#3498db; color:#fff; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; font-weight:bold; transition:0.3s; }
+  .menu button:hover { background:#2980b9; }
+  table { width:90%; max-width:900px; border-collapse:collapse; margin-top:20px; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+  th, td { padding:12px; border-bottom:1px solid #eee; text-align:center; }
+  th { background:#3498db; color:white; }
+  tr:hover { background:#f1f1f1; }
+</style>
+</head>
+<body>
+
+<h1>🛰 Tablero Aéreo Minimalista</h1>
+
+<div class="menu">
+  <input type="text" id="numeroVuelo" placeholder="Ingrese número de vuelo">
+  <button onclick="consultarVuelo()">🔍 Consultar Vuelo</button>
+</div>
+
+<table id="tablaVuelos">
+  <thead>
+    <tr>
+      <th>Número de Vuelo</th>
+      <th>Modelo</th>
+      <th>Fabricante</th>
+      <th>Piloto</th>
+      <th>Origen</th>
+      <th>Destino</th>
+      <th>Altitud</th>
+      <th>Velocidad</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+async function consultarVuelo() {
+  const vuelo = document.getElementById("numeroVuelo").value;
+  if (!vuelo) return alert("Ingresa un número de vuelo");
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/consultar_vuelo?numero=${vuelo}`);
+    const data = await res.json();
+
+    const tbody = document.querySelector("#tablaVuelos tbody");
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='8'>No se encontró el vuelo</td></tr>";
+    } else {
+      data.forEach(v => {
+        tbody.innerHTML += `<tr>
+          <td>${v.numero}</td>
+          <td>${v.modelo}</td>
+          <td>${v.fabricante}</td>
+          <td>${v.piloto}</td>
+          <td>${v.origen}</td>
+          <td>${v.destino}</td>
+          <td>${v.altitud}</td>
+          <td>${v.velocidad}</td>
+        </tr>`;
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error al consultar la base de datos");
+  }
+}
+</script>
+
+</body>
+</html>
